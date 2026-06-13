@@ -41,7 +41,7 @@ fun main() {
         println("   4. Exit")
         println()
         print("Enter choice: ")
-        menuChoice = readLine()?.toInt()
+        menuChoice = readLine()?.toIntOrNull() // toIntOrNull() protects the app from crashing if there is any null input
 
         when (menuChoice) {
             1 -> println("Current Balance: ${balanceAmount} INR") // If the balance changes later through deposits and withdrawals, this option will automatically show the updated amount.
