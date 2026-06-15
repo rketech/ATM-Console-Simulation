@@ -61,7 +61,7 @@ fun main() {
 
             4 -> {
                 println("Exiting ATM")
-                break
+                // break // while (menuChoice != 4) is already present so removing break. Both do the same job
             }
 
             else -> println("Invalid Choice")
