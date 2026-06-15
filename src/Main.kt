@@ -94,17 +94,31 @@ fun deposit(balance: Double): Double {
     4. If sufficient, deduct amount and return new balance.
     5. Otherwise, display error and return old balance.
 */
-fun withdraw(balance: Double): Double{
+fun withdraw(balance: Double): Double {
 
     print("Enter the withdraw amount: ")
 
     val withdrawAmount = readln().toDoubleOrNull()
 
-    return if(withdrawAmount!=null && withdrawAmount <= balance) {
-        balance - withdrawAmount
-    }else{
-        println("Withdrawal Unsuccessful.")
-        balance
+    return when {
+        withdrawAmount == null -> {
+            println("Invalid Amount")
+            balance
+        }
+
+        withdrawAmount > balance -> {
+            println("Insufficient funds")
+            balance
+        }
+
+        withdrawAmount <= 0 -> {
+            println("Amount must be greater than 0")
+            balance
+        }
+
+        else -> {
+            balance - withdrawAmount
+        }
     }
 }
 
