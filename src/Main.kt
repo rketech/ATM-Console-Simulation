@@ -59,10 +59,16 @@ fun main() {
                 println("The updated balance within account after withdrawal is : $balanceAmount INR")
             }
 
-            4 -> println("Exiting ATM")
+            4 -> {
+                println("Exiting ATM")
+                break
+            }
+
             else -> println("Invalid Choice")
         }
     } while (menuChoice != 4)
+    println()
+    println("Thank you for using ATM Console Simulation")
 } // Main Function Ends
 
 /* Deposit Function
