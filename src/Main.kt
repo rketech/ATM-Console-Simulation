@@ -24,14 +24,82 @@
                 sealed class Result for success/error messages
 */
 
+// Implementing Class Design & State Management
+class Account(
+    val accountNumber: String,
+    private val pin: Int,
+    private var balance: Double
+) {
+    // PIN Verification Behavior
+    fun verifyPin(enteredPin: Int?): Boolean {
+        return enteredPin == pin
+    }
+
+    // Check Balance Behavior
+    fun checkBalance(): Double {
+        return balance
+    }
+
+    // Deposit Behavior
+    fun deposit(amount: Double?): Boolean {
+        if (amount != null) {
+            if (amount <= 0) {
+                return false
+            }
+            balance += amount
+            return true
+        }
+        return false
+    }
+
+    // Withdraw Behavior
+    fun withdraw(amount: Double): Boolean {
+        if (amount <= 0) {
+            return false
+        }
+        if (balance >= amount) {
+            return false
+        }
+        balance -= amount
+        return true
+    }
+}
+
 fun main() {
     println("=================================")
     println("      ATM Console Simulation     ")
     println("=================================")
 
-    var balanceAmount = 5000.0 // Balance can never be null so null safety operator is not required
+    val account = Account(
+        accountNumber = "ACCOUNT007",
+        pin = 111,
+        balance = 7000.0 // Balance can never be null so null safety operator is not required
+    )
+    //var balanceAmount = 5000.0 // Balance can never be null so null safety operator is not required
     var menuChoice: Int?
+    var loginAttempts = 0
 
+    // Validating ATM PIN
+    while (loginAttempts < 3) {
+        print("Enter PIN: ") // is an action (a function call)
+        val enteredPin = readlnOrNull()?.toIntOrNull() // Variable dies at the end of the loop iteration. So Val
+
+        if (account.verifyPin(enteredPin)) {
+            println("PIN verified successfully")
+            break
+        } else {
+            loginAttempts++
+            println("Incorrect PIN")
+            println("Attempts Remaining: ${3 - loginAttempts}")
+        }
+    }
+    if (loginAttempts == 3) {
+        println("Maximum login attempts reached")
+        println("Account Locked")
+        return // The return exits main() immediately all attempts are exhausted. No ATM Menu is provided
+    }
+
+    // Entering ATM Menu
     do {
         println("-----ATM Menu-----")
         println()
@@ -45,18 +113,22 @@ fun main() {
             readlnOrNull()?.toIntOrNull() // toIntOrNull() protects the app from crashing if there is any null input
 
         when (menuChoice) {
-            1 -> println("Current Balance: ${balanceAmount} INR") // If the balance changes later through deposits and withdrawals, this option will automatically show the updated amount.
+            1 -> println("Current Balance for ${account.accountNumber} is : ${account.checkBalance()} INR") // If the balance changes later through deposits and withdrawals, this option will automatically show the updated amount.
             2 -> {
-                balanceAmount =
-                    deposit(balanceAmount) // taking the value returned by the function and storing it back into the account balance. WARNING NOTE** One small logical issue Imagine this scenario: Current Balance = 5000 User chooses Deposit Deposit Amount = abc Your function prints: Invalid Amount and returns: 5000 But then the code in main() still prints: Amount deposited Successfully The updated balance within account is : 5000.0 INR That's not actually true because the deposit failed. Why this happens Your function returns the balance in both cases: Success return balance + depositAmount Failure return balance So main() cannot tell whether the operation succeeded or failed. For now Leave it exactly as it is.We'll improve this later when we learn:Data Classes Sealed Classes Result objects  Those concepts solve this problem elegantly. For Version 1, your current approach is perfectly acceptable.
-                println("Amount deposited Successfully")
-                println("The updated balance within account after deposit is : $balanceAmount INR")
+                print("Enter the deposit amount: ")
+                val amount = readlnOrNull()?.toDoubleOrNull()
+                if (account.deposit(amount)) {
+                    println("Amount Deposited Succefully")
+                }else{
+                    println("Deposit Not Succefully")
+                }
             }
 
             3 -> {
-                balanceAmount = withdraw(balanceAmount)
-                println("Amount withdrawn Successfully")
-                println("The updated balance within account after withdrawal is : $balanceAmount INR")
+//                balanceAmount = withdraw(balanceAmount)
+//                println("Amount withdrawn Successfully")
+//                println("The updated balance within account after withdrawal is : $balanceAmount INR")
+                println("Withdraw feature coming soon")
             }
 
             4 -> {
@@ -70,62 +142,5 @@ fun main() {
     println()
     println("Thank you for using ATM Console Simulation")
 } // Main Function Ends
-
-/* Deposit Function
-    1. Asks for the deposit amount.
-    2. Reads the amount.
-    3. Adds it to balanceAmount.
-    4. Displays:
-        a. Deposit Successful
-        b. Updated Balance
-*/
-fun deposit(balance: Double): Double {
-
-    print("Enter the deposit amount: ")
-
-    val depositAmount = readln().toDoubleOrNull()
-
-    return if (depositAmount != null && depositAmount > 0) {
-        balance + depositAmount
-    } else {
-        println("Invalid Amount")
-        balance
-    }
-}
-
-/* Withdraw Function
-    1. Ask user for withdrawal amount.
-    2. Validate the amount.
-    3. Check if balance is sufficient.
-    4. If sufficient, deduct amount and return new balance.
-    5. Otherwise, display error and return old balance.
-*/
-fun withdraw(balance: Double): Double {
-
-    print("Enter the withdraw amount: ")
-
-    val withdrawAmount = readln().toDoubleOrNull()
-
-    return when {
-        withdrawAmount == null -> {
-            println("Invalid Amount")
-            balance
-        }
-
-        withdrawAmount > balance -> {
-            println("Insufficient funds")
-            balance
-        }
-
-        withdrawAmount <= 0 -> {
-            println("Amount must be greater than 0")
-            balance
-        }
-
-        else -> {
-            balance - withdrawAmount
-        }
-    }
-}
 
 
