@@ -93,15 +93,18 @@ fun main() {
     print("Enter your account number: ")
     val enteredAccount = readlnOrNull()
 
-    var selectedAccount: Account? = null
-    for (account in accounts) {
-        if (enteredAccount != null) {
-            if (enteredAccount == account.accountNumber) {
-                selectedAccount = account
-                break
-            }
-        }
-    }
+//    var selectedAccount: Account? = null
+//    for (account in accounts) {
+//        if (enteredAccount != null) {
+//            if (enteredAccount == account.accountNumber) {
+//                selectedAccount = account
+//                break
+//            }
+//        }
+//    }
+    // Replaced the above manual account search loop with Kotlin's collection function:
+    val selectedAccount = accounts.find { it.accountNumber == enteredAccount }
+
     // If the user entered account number do not match the database, the program will exit via below code
     if (selectedAccount == null) {
         println("Account Not Found")
