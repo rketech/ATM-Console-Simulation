@@ -48,6 +48,7 @@ class Account(
                 return false
             }
             balance += amount
+            transactions.add(Transaction(TransactionType.DEPOSIT, amount))
             return true
         }
         println("Enter a valid amount")
@@ -65,6 +66,7 @@ class Account(
                 return false
             } else {
                 balance -= amount
+                transactions.add(Transaction(TransactionType.WITHDRAW, amount))
                 return true
             }
         } else {
@@ -72,6 +74,28 @@ class Account(
             return false
         }
 
+    }
+
+    // Preparing for Transaction History
+    enum class TransactionType {
+        DEPOSIT,
+        WITHDRAW
+    }
+
+    data class Transaction(
+        val transactionType: TransactionType,
+        val transactionAmount: Double
+    )
+
+    private val transactions = mutableListOf<Transaction>()
+
+    fun showTransactions() {
+        if (transactions.isEmpty()) {
+            println("No transactions found")
+        }
+        for (t in transactions) {
+            println("Type: ${t.transactionType} | Amount: ${t.transactionAmount}")
+        }
     }
 }
 
@@ -135,7 +159,8 @@ fun main() {
         println("   1. Check Balance")
         println("   2. Deposit Money")
         println("   3. Withdraw Money")
-        println("   4. Exit")
+        println("   4. Show Transaction History")
+        println("   5. Exit")
         println()
         print("Enter choice: ")
         menuChoice =
@@ -166,13 +191,18 @@ fun main() {
             }
 
             4 -> {
+                println("Transaction History for Account Number: ${selectedAccount.accountNumber}")
+                selectedAccount.showTransactions()
+            }
+
+            5 -> {
                 println("Exiting ATM")
-                // while (menuChoice != 4) is already present so removing break. So break is not required as Both do the same job
+                // while (menuChoice != 5) is already present so removing break. So break is not required as Both do the same job
             }
 
             else -> println("Invalid Choice")
         }
-    } while (menuChoice != 4)
+    } while (menuChoice != 5)
     println()
     println("Thank you for using ATM Console Simulation")
 } // Main Function Ends
