@@ -82,12 +82,34 @@ fun main() {
     println("=================================")
     println()
 
-    val account = Account(
-        accountNumber = "ACCOUNT007",
-        pin = 111,
-        balance = 7000.0 // Balance can never be null so null safety operator is not required
+    // Balance can never be null so null safety operator is not required
+    // Multiple Account Handling
+    val accounts = listOf(
+        Account("AC007", 777, 7000.0),
+        Account("AC008", 888, 8000.0),
+        Account("AC009", 999, 9000.0)
     )
-    //var balanceAmount = 5000.0 // Balance can never be null so null safety operator is not required
+
+    print("Enter your account number: ")
+    val enteredAccount = readlnOrNull()
+
+    var selectedAccount: Account? = null
+    for (account in accounts) {
+        if (enteredAccount != null) {
+            if (enteredAccount == account.accountNumber) {
+                selectedAccount = account
+                break
+            }
+        }
+    }
+    // If the user entered account number do not match the database, the program will exit via below code
+    if (selectedAccount == null) {
+        println("Account Not Found")
+        return // because if it were null, this code would execute: return and main() would end.
+    }
+
+    val account = selectedAccount // contains the logged-in account
+
     var menuChoice: Int?
     var loginAttempts = 0
 
@@ -151,7 +173,7 @@ fun main() {
 
             4 -> {
                 println("Exiting ATM")
-                // break // while (menuChoice != 4) is already present so removing break. Both do the same job
+                // while (menuChoice != 4) is already present so removing break. So break is not required as Both do the same job
             }
 
             else -> println("Invalid Choice")
