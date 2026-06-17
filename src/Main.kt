@@ -93,17 +93,8 @@ fun main() {
     print("Enter your account number: ")
     val enteredAccount = readlnOrNull()
 
-//    var selectedAccount: Account? = null
-//    for (account in accounts) {
-//        if (enteredAccount != null) {
-//            if (enteredAccount == account.accountNumber) {
-//                selectedAccount = account
-//                break
-//            }
-//        }
-//    }
-    // Replaced the above manual account search loop with Kotlin's collection function:
-    val selectedAccount = accounts.find { it.accountNumber == enteredAccount }
+    // Replaced the manual account search loop with Kotlin's collection function:
+    val selectedAccount = accounts.find { it.accountNumber == enteredAccount } // contains the logged-in account
 
     // If the user entered account number do not match the database, the program will exit via below code
     if (selectedAccount == null) {
@@ -111,7 +102,7 @@ fun main() {
         return // because if it were null, this code would execute: return and main() would end.
     }
 
-    val account = selectedAccount // contains the logged-in account
+    //val account = selectedAccount // contains the logged-in account
 
     var menuChoice: Int?
     var loginAttempts = 0
@@ -121,7 +112,7 @@ fun main() {
         print("Enter PIN: ") // is an action (a function call)
         val enteredPin = readlnOrNull()?.toIntOrNull() // Variable dies at the end of the loop iteration. So Val
 
-        if (account.verifyPin(enteredPin)) {
+        if (selectedAccount.verifyPin(enteredPin)) {
             println("PIN verified successfully")
             break
         } else {
@@ -151,13 +142,13 @@ fun main() {
             readlnOrNull()?.toIntOrNull() // toIntOrNull() protects the app from crashing if there is any null input
 
         when (menuChoice) {
-            1 -> println("Current Balance for ${account.accountNumber} is : ${account.checkBalance()} INR") // If the balance changes later through deposits and withdrawals, this option will automatically show the updated amount.
+            1 -> println("Current Balance for ${selectedAccount.accountNumber} is : ${selectedAccount.checkBalance()} INR") // If the balance changes later through deposits and withdrawals, this option will automatically show the updated amount.
             2 -> {
                 print("Enter the deposit amount: ")
                 val amount = readlnOrNull()?.toDoubleOrNull()
-                if (account.deposit(amount)) {
+                if (selectedAccount.deposit(amount)) {
                     println("Amount Deposited Successfully")
-                    println("Updated Account Balance : ${account.checkBalance()}")
+                    println("Updated Account Balance : ${selectedAccount.checkBalance()}")
                 } else {
                     println("Deposit Not Successful")
                 }
@@ -166,9 +157,9 @@ fun main() {
             3 -> {
                 print("Enter the withdrawal amount: ")
                 val amount = readlnOrNull()?.toDoubleOrNull()
-                if (account.withdraw(amount)) {
+                if (selectedAccount.withdraw(amount)) {
                     println("Amount Withdrawal Successfully")
-                    println("Updated Account Balance : ${account.checkBalance()}")
+                    println("Updated Account Balance : ${selectedAccount.checkBalance()}")
                 } else {
                     println("Withdrawal Not Successful")
                 }
