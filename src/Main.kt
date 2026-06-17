@@ -60,7 +60,7 @@ class Account(
             if (amount <= 0) {
                 println("Enter a valid amount")
                 return false
-            } else if (balance <= amount) {
+            } else if (balance < amount) {
                 println("Insufficient funds")
                 return false
             } else {
