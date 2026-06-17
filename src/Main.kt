@@ -44,31 +44,43 @@ class Account(
     fun deposit(amount: Double?): Boolean {
         if (amount != null) {
             if (amount <= 0) {
+                println("Enter a valid amount")
                 return false
             }
             balance += amount
             return true
         }
+        println("Enter a valid amount")
         return false
     }
 
     // Withdraw Behavior
-    fun withdraw(amount: Double): Boolean {
-        if (amount <= 0) {
+    fun withdraw(amount: Double?): Boolean {
+        if (amount != null) {
+            if (amount <= 0) {
+                println("Enter a valid amount")
+                return false
+            } else if (balance <= amount) {
+                println("Insufficient funds")
+                return false
+            } else {
+                balance -= amount
+                return true
+            }
+        } else {
+            println("Enter a valid amount")
             return false
         }
-        if (balance >= amount) {
-            return false
-        }
-        balance -= amount
-        return true
+
     }
 }
 
 fun main() {
+    println()
     println("=================================")
     println("      ATM Console Simulation     ")
     println("=================================")
+    println()
 
     val account = Account(
         accountNumber = "ACCOUNT007",
@@ -101,6 +113,7 @@ fun main() {
 
     // Entering ATM Menu
     do {
+        println()
         println("-----ATM Menu-----")
         println()
         println("   1. Check Balance")
@@ -118,17 +131,22 @@ fun main() {
                 print("Enter the deposit amount: ")
                 val amount = readlnOrNull()?.toDoubleOrNull()
                 if (account.deposit(amount)) {
-                    println("Amount Deposited Succefully")
-                }else{
-                    println("Deposit Not Succefully")
+                    println("Amount Deposited Successfully")
+                    println("Updated Account Balance : ${account.checkBalance()}")
+                } else {
+                    println("Deposit Not Successful")
                 }
             }
 
             3 -> {
-//                balanceAmount = withdraw(balanceAmount)
-//                println("Amount withdrawn Successfully")
-//                println("The updated balance within account after withdrawal is : $balanceAmount INR")
-                println("Withdraw feature coming soon")
+                print("Enter the withdrawal amount: ")
+                val amount = readlnOrNull()?.toDoubleOrNull()
+                if (account.withdraw(amount)) {
+                    println("Amount Withdrawal Successfully")
+                    println("Updated Account Balance : ${account.checkBalance()}")
+                } else {
+                    println("Withdrawal Not Successful")
+                }
             }
 
             4 -> {
