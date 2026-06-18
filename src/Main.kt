@@ -23,8 +23,19 @@
                 Transaction class
                 sealed class Result for success/error messages
 */
+// -------  Implementing Class Design & State Management -------
 
-// Implementing Class Design & State Management
+// Preparing for Transaction History
+enum class TransactionType {
+    DEPOSIT,
+    WITHDRAW
+}
+
+data class Transaction(
+    val transactionType: TransactionType,
+    val transactionAmount: Double
+)
+
 class Account(
     val accountNumber: String,
     private val pin: Int,
@@ -77,21 +88,12 @@ class Account(
     }
 
     // Preparing for Transaction History
-    enum class TransactionType {
-        DEPOSIT,
-        WITHDRAW
-    }
-
-    data class Transaction(
-        val transactionType: TransactionType,
-        val transactionAmount: Double
-    )
-
     private val transactions = mutableListOf<Transaction>()
 
     fun showTransactions() {
         if (transactions.isEmpty()) {
             println("No transactions found")
+            return
         }
         for (t in transactions) {
             println("Type: ${t.transactionType} | Amount: ${t.transactionAmount}")
@@ -183,7 +185,7 @@ fun main() {
                 print("Enter the withdrawal amount: ")
                 val amount = readlnOrNull()?.toDoubleOrNull()
                 if (selectedAccount.withdraw(amount)) {
-                    println("Amount Withdrawal Successfully")
+                    println("Amount Withdrawan Successfully")
                     println("Updated Account Balance : ${selectedAccount.checkBalance()}")
                 } else {
                     println("Withdrawal Not Successful")
