@@ -36,6 +36,20 @@ data class Transaction(
     val transactionAmount: Double
 )
 
+// Creating sealed class for better error / information handeling
+sealed class TransactionResult {
+
+    data class Success(
+        // Success is a child of TransactionResult.
+        val transaction: Transaction,
+        val updatedBalance: Double,
+    ) : TransactionResult()
+
+    data class Error(
+        val message: String,
+    ) : TransactionResult()
+}
+
 class Account(
     val accountNumber: String,
     private val pin: Int,
@@ -52,39 +66,35 @@ class Account(
     }
 
     // Deposit Behavior
-    fun deposit(amount: Double?): Boolean {
+    fun deposit(amount: Double?): TransactionResult {
         if (amount != null) {
             if (amount <= 0) {
-                println("Enter a valid amount")
-                return false
+                return TransactionResult.Error("Enter a valid amount")
             }
             balance += amount
-            transactions.add(Transaction(TransactionType.DEPOSIT, amount))
-            return true
+            val transaction = Transaction(TransactionType.DEPOSIT, amount)
+            transactions.add(transaction)
+            return TransactionResult.Success(transaction, balance)
         }
-        println("Enter a valid amount")
-        return false
+        return TransactionResult.Error("Enter a valid amount")
     }
 
     // Withdraw Behavior
-    fun withdraw(amount: Double?): Boolean {
+    fun withdraw(amount: Double?): TransactionResult {
         if (amount != null) {
             if (amount <= 0) {
-                println("Enter a valid amount")
-                return false
+                return TransactionResult.Error("Enter a valid amount")
             } else if (balance < amount) {
-                println("Insufficient funds")
-                return false
+                return TransactionResult.Error("Insufficient funds")
             } else {
                 balance -= amount
-                transactions.add(Transaction(TransactionType.WITHDRAW, amount))
-                return true
+                val transaction = Transaction(TransactionType.WITHDRAW, amount)
+                transactions.add(transaction)
+                return TransactionResult.Success(transaction, balance)
             }
         } else {
-            println("Enter a valid amount")
-            return false
+            return TransactionResult.Error("Enter a valid amount")
         }
-
     }
 
     // Preparing for Transaction History
@@ -173,22 +183,34 @@ fun main() {
             2 -> {
                 print("Enter the deposit amount: ")
                 val amount = readlnOrNull()?.toDoubleOrNull()
-                if (selectedAccount.deposit(amount)) {
-                    println("Amount Deposited Successfully")
-                    println("Updated Account Balance : ${selectedAccount.checkBalance()}")
-                } else {
-                    println("Deposit Not Successful")
+                when (val result = selectedAccount.deposit(amount)) {
+                    is TransactionResult.Success -> {
+                        println("Amount deposited successfully")
+                        println("Transaction Type: ${result.transaction.transactionType}")
+                        println("Transaction Amount: ${result.transaction.transactionAmount}")
+                        println("Updated Balance: ${result.updatedBalance}")
+                    }
+
+                    is TransactionResult.Error -> {
+                        println("Error: ${result.message}")
+                    }
                 }
             }
 
             3 -> {
                 print("Enter the withdrawal amount: ")
                 val amount = readlnOrNull()?.toDoubleOrNull()
-                if (selectedAccount.withdraw(amount)) {
-                    println("Amount Withdrawan Successfully")
-                    println("Updated Account Balance : ${selectedAccount.checkBalance()}")
-                } else {
-                    println("Withdrawal Not Successful")
+                when (val result = selectedAccount.withdraw(amount)) {
+                    is TransactionResult.Success -> {
+                        println("Amount withdrawal successfully")
+                        println("Transaction Type: ${result.transaction.transactionType}")
+                        println("Transaction Amount: ${result.transaction.transactionAmount}")
+                        println("Updated Balance: ${result.updatedBalance}")
+                    }
+
+                    is TransactionResult.Error -> {
+                        println("Error: ${result.message}")
+                    }
                 }
             }
 
