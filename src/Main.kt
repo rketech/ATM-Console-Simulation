@@ -111,36 +111,20 @@ class Account(
     }
 }
 
-fun main() {
-    println()
-    println("=================================")
-    println("      ATM Console Simulation     ")
-    println("=================================")
-    println()
-
-    // Balance can never be null so null safety operator is not required
-    // Multiple Account Handling
-    val accounts = listOf(
-        Account("AC007", 777, 7000.0),
-        Account("AC008", 888, 8000.0),
-        Account("AC009", 999, 9000.0)
-    )
-
+fun login(accounts: List<Account>): Account? // account: List<Account> means Give me all available accounts. The function needs them because it has to search for the account number entered by the user.
+{
     print("Enter your account number: ")
     val enteredAccount = readlnOrNull()
 
-    // Replaced the manual account search loop with Kotlin's collection function:
-    val selectedAccount = accounts.find { it.accountNumber == enteredAccount } // contains the logged-in account
+    val selectedAccount = accounts.find { it.accountNumber == enteredAccount }
 
     // If the user entered account number do not match the database, the program will exit via below code
     if (selectedAccount == null) {
-        println("Account Not Found")
-        return // because if it were null, this code would execute: return and main() would end.
+        println("No account found")
+        return null // because if it were null, this code would execute: return and main() would end.
     }
 
-    //val account = selectedAccount // contains the logged-in account
 
-    var menuChoice: Int?
     var loginAttempts = 0
 
     // Validating ATM PIN
@@ -150,7 +134,7 @@ fun main() {
 
         if (selectedAccount.verifyPin(enteredPin)) {
             println("PIN verified successfully")
-            break
+            return selectedAccount // contains the logged-in account
         } else {
             loginAttempts++
             println("Incorrect PIN")
@@ -160,8 +144,13 @@ fun main() {
     if (loginAttempts == 3) {
         println("Maximum login attempts reached")
         println("Account Locked")
-        return // The return exits main() immediately all attempts are exhausted. No ATM Menu is provided
+        return null// The return exits main() immediately all attempts are exhausted. No ATM Menu is provided
     }
+    return null
+}
+
+fun showMenu(account: Account) {
+    var menuChoice: Int?
 
     // Entering ATM Menu
     do {
@@ -179,11 +168,11 @@ fun main() {
             readlnOrNull()?.toIntOrNull() // toIntOrNull() protects the app from crashing if there is any null input
 
         when (menuChoice) {
-            1 -> println("Current Balance for ${selectedAccount.accountNumber} is : ${selectedAccount.checkBalance()} INR") // If the balance changes later through deposits and withdrawals, this option will automatically show the updated amount.
+            1 -> println("Current Balance for ${account.accountNumber} is : ${account.checkBalance()} INR") // If the balance changes later through deposits and withdrawals, this option will automatically show the updated amount.
             2 -> {
                 print("Enter the deposit amount: ")
                 val amount = readlnOrNull()?.toDoubleOrNull()
-                when (val result = selectedAccount.deposit(amount)) {
+                when (val result = account.deposit(amount)) {
                     is TransactionResult.Success -> {
                         println("Amount deposited successfully")
                         println("Transaction Type: ${result.transaction.transactionType}")
@@ -200,7 +189,7 @@ fun main() {
             3 -> {
                 print("Enter the withdrawal amount: ")
                 val amount = readlnOrNull()?.toDoubleOrNull()
-                when (val result = selectedAccount.withdraw(amount)) {
+                when (val result = account.withdraw(amount)) {
                     is TransactionResult.Success -> {
                         println("Amount withdrawal successfully")
                         println("Transaction Type: ${result.transaction.transactionType}")
@@ -215,8 +204,8 @@ fun main() {
             }
 
             4 -> {
-                println("Transaction History for Account Number: ${selectedAccount.accountNumber}")
-                selectedAccount.showTransactions()
+                println("Transaction History for Account Number: ${account.accountNumber}")
+                account.showTransactions()
             }
 
             5 -> {
@@ -229,6 +218,28 @@ fun main() {
     } while (menuChoice != 5)
     println()
     println("Thank you for using ATM Console Simulation")
+}
+
+fun main() {
+    println()
+    println("=================================")
+    println("      ATM Console Simulation     ")
+    println("=================================")
+    println()
+
+    // Balance can never be null so null safety operator is not required
+    // Multiple Account Handling
+    val accounts = listOf(
+        Account("AC007", 777, 7000.0),
+        Account("AC008", 888, 8000.0),
+        Account("AC009", 999, 9000.0)
+    )
+
+    // Replaced the Kotlin's collection function with login function under clean design
+    val selectedAccount = login(accounts) ?: return // contains the logged-in account
+
+    showMenu(selectedAccount)
+
 } // Main Function Ends
 
 
