@@ -109,6 +109,20 @@ class Account(
             println("Type: ${t.transactionType} | Amount: ${t.transactionAmount}")
         }
     }
+
+    // Preparing Transfer Fund
+    fun transfer(
+        destinationAccount: Account,
+        amount: Double?,
+    ): TransactionResult {
+        if (amount == null || amount <= 0) {
+            return TransactionResult.Error("Enter a valid amount")
+        }
+        if (destinationAccount == this) {
+            return TransactionResult.Error("Cannot transfer to the same account")
+        }
+        return TransactionResult.Error("Transfer not implemented yet")
+    }
 }
 
 fun login(accounts: List<Account>): Account? // account: List<Account> means Give me all available accounts. The function needs them because it has to search for the account number entered by the user.
@@ -161,7 +175,8 @@ fun showMenu(account: Account) {
         println("   2. Deposit Money")
         println("   3. Withdraw Money")
         println("   4. Show Transaction History")
-        println("   5. Exit")
+        println("   5. Transfer Money")
+        println("   6. Exit")
         println()
         print("Enter choice: ")
         menuChoice =
@@ -208,7 +223,9 @@ fun showMenu(account: Account) {
                 account.showTransactions()
             }
 
-            5 -> {
+            5 -> {}
+
+            6 -> {
                 println("Exiting ATM")
                 // while (menuChoice != 5) is already present so removing break. So break is not required as Both do the same job
             }
