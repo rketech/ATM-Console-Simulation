@@ -28,7 +28,9 @@
 // Preparing for Transaction History
 enum class TransactionType {
     DEPOSIT,
-    WITHDRAW
+    WITHDRAW,
+    TRANSFER_IN,
+    TRANSFER_OUT
 }
 
 data class Transaction(
@@ -121,7 +123,49 @@ class Account(
         if (destinationAccount == this) {
             return TransactionResult.Error("Cannot transfer to the same account")
         }
-        return TransactionResult.Error("Transfer not implemented yet")
+        if (balance < amount) {
+            return TransactionResult.Error("Insufficient funds")
+        }
+        balance -= amount
+        destinationAccount.balance += amount
+
+        val senderTransaction = Transaction(TransactionType.TRANSFER_OUT, amount)
+        val receiverTransaction = Transaction(TransactionType.TRANSFER_IN, amount)
+
+        // Adding Transfer Transaction History for both parties
+        transactions.add(senderTransaction)
+        destinationAccount.transactions.add(receiverTransaction)
+
+        return TransactionResult.Success(senderTransaction, balance)
+    }
+}
+
+fun fundTransfer(
+    sourceAccount: Account,
+    accounts: List<Account>,
+) {
+    print("Enter destination account number: ")
+    val destinationAccountNumber = readlnOrNull()
+
+    val destinationAccount = accounts.find { it.accountNumber == destinationAccountNumber }
+
+    if (destinationAccount == null) {
+        println("Destination account not found")
+        return
+    }else{
+        print("Enter the transfer amount: ")
+        val amount = readlnOrNull()?.toDoubleOrNull()
+
+        when (val result = sourceAccount.transfer(destinationAccount, amount)) {
+            is TransactionResult.Success -> {
+                println("Successfully funded from ${sourceAccount.accountNumber} to ${destinationAccount.accountNumber}")
+                println("Transaction Type: ${TransactionType.TRANSFER_OUT}")
+                println("Transfer Amount: $amount")
+            }
+            is TransactionResult.Error -> {
+                println("Error: ${result.message}")
+            }
+        }
     }
 }
 
@@ -163,7 +207,10 @@ fun login(accounts: List<Account>): Account? // account: List<Account> means Giv
     return null
 }
 
-fun showMenu(account: Account) {
+fun showMenu(
+    account: Account,
+    accounts: List<Account>
+) {
     var menuChoice: Int?
 
     // Entering ATM Menu
@@ -223,7 +270,9 @@ fun showMenu(account: Account) {
                 account.showTransactions()
             }
 
-            5 -> {}
+            5 -> {
+                fundTransfer(account, accounts)
+            }
 
             6 -> {
                 println("Exiting ATM")
@@ -232,7 +281,7 @@ fun showMenu(account: Account) {
 
             else -> println("Invalid Choice")
         }
-    } while (menuChoice != 5)
+    } while (menuChoice != 6)
     println()
     println("Thank you for using ATM Console Simulation")
 }
@@ -255,7 +304,7 @@ fun main() {
     // Replaced the Kotlin's collection function with login function under clean design
     val selectedAccount = login(accounts) ?: return // contains the logged-in account
 
-    showMenu(selectedAccount)
+    showMenu(selectedAccount, accounts)
 
 } // Main Function Ends
 
