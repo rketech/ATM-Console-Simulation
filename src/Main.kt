@@ -149,21 +149,29 @@ fun fundTransfer(
 
     val destinationAccount = accounts.find { it.accountNumber == destinationAccountNumber }
 
-    if (destinationAccount == null) {
-        println("Destination account not found")
-        return
-    }else{
-        print("Enter the transfer amount: ")
-        val amount = readlnOrNull()?.toDoubleOrNull()
+    when (destinationAccount) {
+        null -> {
+            println("Destination account not found")
+            return
+        }
+        sourceAccount -> {
+            println("Cannot transfer to the same account")
+            return
+        }
+        else -> {
+            print("Enter the transfer amount: ")
+            val amount = readlnOrNull()?.toDoubleOrNull()
 
-        when (val result = sourceAccount.transfer(destinationAccount, amount)) {
-            is TransactionResult.Success -> {
-                println("Successfully funded from ${sourceAccount.accountNumber} to ${destinationAccount.accountNumber}")
-                println("Transaction Type: ${TransactionType.TRANSFER_OUT}")
-                println("Transfer Amount: $amount")
-            }
-            is TransactionResult.Error -> {
-                println("Error: ${result.message}")
+            when (val result = sourceAccount.transfer(destinationAccount, amount)) {
+                is TransactionResult.Success -> {
+                    println("Successfully funded from ${sourceAccount.accountNumber} to ${destinationAccount.accountNumber}")
+                    println("Transaction Type: ${TransactionType.TRANSFER_OUT}")
+                    println("Transfer Amount: $amount")
+                }
+
+                is TransactionResult.Error -> {
+                    println("Error: ${result.message}")
+                }
             }
         }
     }
