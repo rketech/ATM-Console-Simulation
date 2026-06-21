@@ -1,4 +1,4 @@
-// Creating sealed class for better error / information handeling
+// Creating sealed class for better error / information handling
 sealed class TransactionResult {
 
     data class Success(

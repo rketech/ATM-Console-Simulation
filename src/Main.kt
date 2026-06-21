@@ -25,43 +25,6 @@
 */
 // -------  Implementing Class Design & State Management -------
 
-fun fundTransfer(
-    sourceAccount: Account,
-    accounts: List<Account>,
-) {
-    print("Enter destination account number: ")
-    val destinationAccountNumber = readlnOrNull()
-
-    val destinationAccount = accounts.find { it.accountNumber == destinationAccountNumber }
-
-    when (destinationAccount) {
-        null -> {
-            println("Destination account not found")
-            return
-        }
-        sourceAccount -> {
-            println("Cannot transfer to the same account")
-            return
-        }
-        else -> {
-            print("Enter the transfer amount: ")
-            val amount = readlnOrNull()?.toDoubleOrNull()
-
-            when (val result = sourceAccount.transfer(destinationAccount, amount)) {
-                is TransactionResult.Success -> {
-                    println("Successfully funded from ${sourceAccount.accountNumber} to ${destinationAccount.accountNumber}")
-                    println("Transaction Type: ${TransactionType.TRANSFER_OUT}")
-                    println("Transfer Amount: $amount")
-                }
-
-                is TransactionResult.Error -> {
-                    println("Error: ${result.message}")
-                }
-            }
-        }
-    }
-}
-
 fun login(accounts: List<Account>): Account? // account: List<Account> means Give me all available accounts. The function needs them because it has to search for the account number entered by the user.
 {
     print("Enter your account number: ")
@@ -179,6 +142,43 @@ fun showMenu(
     println("Thank you for using ATM Console Simulation")
 }
 
+fun fundTransfer(
+    sourceAccount: Account,
+    accounts: List<Account>,
+) {
+    print("Enter destination account number: ")
+    val destinationAccountNumber = readlnOrNull()
+
+    val destinationAccount = accounts.find { it.accountNumber == destinationAccountNumber }
+
+    when (destinationAccount) {
+        null -> {
+            println("Destination account not found")
+            return
+        }
+        sourceAccount -> {
+            println("Cannot transfer to the same account")
+            return
+        }
+        else -> {
+            print("Enter the transfer amount: ")
+            val amount = readlnOrNull()?.toDoubleOrNull()
+
+            when (val result = sourceAccount.transfer(destinationAccount, amount)) {
+                is TransactionResult.Success -> {
+                    println("Successfully funded from ${sourceAccount.accountNumber} to ${destinationAccount.accountNumber}")
+                    println("Transaction Type: ${TransactionType.TRANSFER_OUT}")
+                    println("Transfer Amount: $amount")
+                }
+
+                is TransactionResult.Error -> {
+                    println("Error: ${result.message}")
+                }
+            }
+        }
+    }
+}
+
 fun main() {
     println()
     println("=================================")
@@ -194,6 +194,7 @@ fun main() {
         Account("AC009", 999, 9000.0)
     )
 
+    println("")
     // Replaced the Kotlin's collection function with login function under clean design
     val selectedAccount = login(accounts) ?: return // contains the logged-in account
 
